@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.stats import rv_discrete
+import vectorutils as vu
+from sampling import discrete_sample
 
 np.random.seed(87655678)
 
@@ -23,41 +24,13 @@ def get_M3():
     return get_M(0.001, 0.5)
     
 def test():
-    approximation_error_walkers(T=get_M1(), walkers=1000, steps=100, norm=norm2)
-    approximation_error_walkers(T=get_M2(), walkers=1000, steps=100, norm=norm2)
-    approximation_error_walkers(T=get_M3(), walkers=1000, steps=100, norm=norm2)
-    
-############################################################################### 
-# NORMS
-############################################################################### 
-def norm2(v):
-    return np.linalg.norm(v)
-    
-def norm1(v):
-    return np.sum(np.abs(v))
-    
-def normalise(v, fnorm):
-    norm=fnorm(v)
-    if norm==0: 
-        return v
-    return v/norm
-
-def normalise2(v):
-    return normalise(v, norm2)
-    
-def normalise1(v):
-    return normalise(v, norm1)
+    approximation_error_walkers(T=get_M1(), walkers=1000, steps=100, norm=vu.norm2)
+    approximation_error_walkers(T=get_M2(), walkers=1000, steps=100, norm=vu.norm2)
+    approximation_error_walkers(T=get_M3(), walkers=1000, steps=100, norm=vu.norm2)
 
 ############################################################################### 
 # DISCRETE-STATE DISCRETE-TIME MARKOV PROCESSES
 ###############################################################################  
-def discrete_sample(values, probabilities, ns=1):
-    distrib = rv_discrete(values=(range(len(values)), probabilities))
-    indices = distrib.rvs(size=ns)
-    if ns == 1:
-        return map(values.__getitem__, indices)[0]
-    else:
-        return map(values.__getitem__, indices) 
 
 def direct_simulation(T, steps, X0=0):
     X = np.zeros((steps+1), dtype=int)
@@ -84,7 +57,7 @@ def invariant_distribution(T):
     if (I == None):
         raise Error('No eigenvalue is equal to 1.0')
     else:
-        return normalise1(I)
+        return vu.normalise1(I)
 
 def invariant_distribution_via_direct_simulation(T, walkers, steps):
     invd = np.zeros(T.shape[0], dtype=int)
@@ -93,7 +66,7 @@ def invariant_distribution_via_direct_simulation(T, walkers, steps):
         invd[i] = invd[i] + 1
     return np.float64(invd) / np.float64(walkers)
         
-def approximation_error_walkers(T, walkers, steps, norm=norm2):
+def approximation_error_walkers(T, walkers, steps, norm=vu.norm2):
     I = invariant_distribution(T)
     ews = np.zeros((walkers), dtype=np.float64)
     invd = np.zeros(T.shape[0], dtype=int)
@@ -107,7 +80,7 @@ def approximation_error_walkers(T, walkers, steps, norm=norm2):
     plt.xlabel('Walkers')
     plt.ylabel('Error')
     plt.show()
-
+    
 class Error(Exception):
     def __init__(self, msg=None):
         self.msg = msg
