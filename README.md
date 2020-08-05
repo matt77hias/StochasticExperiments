@@ -11,4 +11,4 @@ Course Deterministic and Stochastic Integration Techniques: Stochastic experimen
 ## About
 Numerical integration and simulation using Monte Carlo techniques (e.g., Metropolis, Metropolis-Hastings). 
 
-<p align="center"><img src="graphs/BrownianMotions.png" width="431"></p>
+<p align="center"><img src="graphs/BrownianMotions.png" width="410"></p>
